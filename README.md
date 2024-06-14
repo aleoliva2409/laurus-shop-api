@@ -33,13 +33,14 @@ $ pnpm run start:prod
 For first time
 
 ```bash
-# add next command into package.json
-pnpm exec husky init
+# add next command into package.json or run on console
+pnpm exec husky
 ```
 
-__Add commands into .husky folder:__
+**Add commands into .husky folder:**
 
 pre-commmit
+
 ```bash
 # copy this into .husky/pre-commmit
 
@@ -51,6 +52,7 @@ pnpm lint-staged
 ```
 
 commit-msg
+
 ```bash
 # copy this into .husky/pre-commmit
 
@@ -59,6 +61,22 @@ commit-msg
 
 npx --no -- commitlint --edit ${1}
 
+```
+
+**or run these commands manually:**
+
+pre-commmit
+
+```bash
+echo "pnpm lint-staged" > .husky/pre-commit
+```
+
+commit-msg
+
+```bash
+# use one of both
+echo "npx --no -- commitlint --edit ${1}" > .husky/commit-msg
+echo "npx --no -- commitlint --edit \$1" > .husky/commit-msg
 ```
 
 ## Migrations
