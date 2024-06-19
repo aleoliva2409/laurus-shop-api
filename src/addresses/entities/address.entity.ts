@@ -2,8 +2,8 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('addresses')
 export class Address {
-  @PrimaryGeneratedColumn('increment')
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column('varchar', { length: 50, name: 'full_name' })
   fullName: string;
@@ -17,8 +17,11 @@ export class Address {
   @Column('varchar', { length: 10, nullable: true })
   number?: string;
 
-  @Column('varchar', { length: 10, nullable: true })
+  @Column('varchar', { length: 5, nullable: true })
   floor?: string;
+
+  @Column('varchar', { length: 15 })
+  zipCode: string;
 
   @Column('varchar', { length: 25 })
   province: string; //TODO: Province Id
@@ -29,9 +32,6 @@ export class Address {
   @Column('varchar', { length: 25, nullable: true })
   location?: string;
 
-  @Column('varchar', { length: 15 })
-  zipCode: string;
-
   @Column('varchar', { length: 30, name: 'between_street_1', nullable: true })
   betweenStreet1?: string;
 
@@ -40,9 +40,6 @@ export class Address {
 
   @Column('varchar', { length: 128, nullable: true })
   observations?: string;
-
-  // @Column('')
-  // country: Country;
 
   // @Column('')
   // user: User;

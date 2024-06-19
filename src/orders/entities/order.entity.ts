@@ -7,12 +7,12 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { Status } from 'src/shared/types/enum/status';
+import { Status } from 'src/shared/types';
 
 @Entity('orders')
 export class Order {
-  @PrimaryGeneratedColumn('increment')
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column('boolean', { default: false, name: 'is_paid' })
   isPaid: boolean;
@@ -23,16 +23,16 @@ export class Order {
   @Column('enum', { enum: Status, default: Status.pendingToPay })
   status: Status;
 
-  @Column('decimal', {
-    name: 'sub_total',
-    precision: 10,
-    scale: 2,
-    transformer: {
-      from: (price: number) => Number(price),
-      to: (price: number) => Number(price),
-    },
-  })
-  subTotal: number;
+  // @Column('decimal', {
+  //   name: 'sub_total',
+  //   precision: 10,
+  //   scale: 2,
+  //   transformer: {
+  //     from: (price: number) => Number(price),
+  //     to: (price: number) => Number(price),
+  //   },
+  // })
+  // subTotal: number;
 
   @Column('decimal', {
     precision: 10,

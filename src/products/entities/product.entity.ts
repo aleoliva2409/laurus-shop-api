@@ -9,14 +9,17 @@ import {
 
 @Entity('products')
 export class Product {
-  @PrimaryGeneratedColumn('increment')
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column('varchar', { length: 100, unique: true })
   title: string;
 
   @Column('varchar', { length: 220 })
   description: string;
+
+  @Column('varchar', { length: 50 })
+  slug: string;
 
   @Column('decimal', {
     nullable: false,
@@ -32,11 +35,10 @@ export class Product {
   @Column('varchar', { length: 150, nullable: true })
   imageUrl?: string;
 
-  @Column('varchar', { length: 15, array: true, default: [] })
-  tags?: string[];
-
-  @Column('varchar', { length: 50 })
-  slug: string;
+  @Column('boolean', { name: 'is_visible', default: true })
+  isVisible: boolean;
+  // @Column('varchar', { length: 15, array: true, default: [] })
+  // tags?: string[];
 
   // @Column('enum', { enum: SizeType, name: 'size_type' })
   // sizeType: SizeType;

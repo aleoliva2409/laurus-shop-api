@@ -7,13 +7,12 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { Role } from 'src/shared/types/enum/role';
+import { Role } from 'src/shared/types';
 
 @Entity('users')
 export class User {
-  //TODO: determinate id's type(uuid or number)
-  @PrimaryGeneratedColumn('increment')
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column('varchar', { length: 50, name: 'full_name' })
   fullName: string;
