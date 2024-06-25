@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { Status } from 'src/shared/types';
+import { Status } from '../../shared/types';
 
 @Entity('orders')
 export class Order {
