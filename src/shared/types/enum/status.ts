@@ -1,7 +1,8 @@
-export enum Status {
+export enum OrderStatus {
   pendingToPay = 'pendingToPay',
   pendingToConfirm = 'pendingToConfirm',
   paid = 'paid',
+  toPackage = 'toPackage',
   sent = 'sent',
-  readyToDelivered = 'readyToDelivered',
+  delivered = 'delivered',
 }

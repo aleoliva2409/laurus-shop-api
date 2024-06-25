@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { Status } from '../../shared/types';
+import { OrderStatus } from '../../shared/types';
 
 @Entity('orders')
 export class Order {
@@ -20,8 +20,14 @@ export class Order {
   @Column('date', { name: 'paid_at', nullable: true })
   paidAt?: Date;
 
-  @Column('enum', { enum: Status, default: Status.pendingToPay })
-  status: Status;
+  @Column('boolean', { default: false, name: 'is_delivered' })
+  isDelivered: boolean;
+
+  @Column('date', { name: 'delivered_at', nullable: true })
+  deliveredAt?: Date;
+
+  @Column('enum', { enum: OrderStatus, default: OrderStatus.pendingToPay })
+  status: OrderStatus;
 
   // @Column('decimal', {
   //   name: 'sub_total',
