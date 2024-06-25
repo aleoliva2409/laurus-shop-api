@@ -16,7 +16,7 @@ export const dataSourceOptions: DataSourceOptions = {
   migrations: [join(__dirname, '../migrations/*{.ts,.js}')],
   synchronize: false,
   logging: configService.get('environment') === 'dev',
-  migrationsRun: false, //?? corre instantaneamente las migrationes generadas cuando se reinicia
+  migrationsRun: false,
   migrationsTableName: 'migrations',
 };
 
