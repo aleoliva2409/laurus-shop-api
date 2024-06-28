@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+
+import { Variant } from './variant.entity';
 
 @Entity('colors')
 export class Color {
@@ -10,4 +12,7 @@ export class Color {
 
   @Column('varchar', { length: 7 })
   code: string;
+
+  @OneToMany(() => Variant, (variant) => variant.color)
+  variants: Variant[];
 }

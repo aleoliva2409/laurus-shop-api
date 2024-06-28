@@ -3,11 +3,15 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { OrderStatus } from '../../shared/types';
+
+import { Address } from '../../addresses/entities';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('orders')
 export class Order {
@@ -53,11 +57,14 @@ export class Order {
   @Column('integer', { name: 'total_items' })
   totalItems: number;
 
-  // @ManyToOne(() => User, (user) => user.orders, { nullable: false })
-  // user: User;
-
   // @OneToMany(() => VariantInOrder, (variantInOrder) => variantInOrder.order)
   // variantInOrder: VariantInOrder[];
+
+  @ManyToOne(() => Address, (address) => address.orders, { nullable: true })
+  address: Address;
+
+  @ManyToOne(() => User, (user) => user.orders, { nullable: false })
+  user: User;
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
   createdAt: Date;

@@ -3,11 +3,15 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { Role } from '../../shared/types';
+
+import { Address } from '../../addresses/entities';
+import { Order } from '../../orders/entities/order.entity';
 
 @Entity('users')
 export class User {
@@ -29,8 +33,11 @@ export class User {
   @Column('enum', { enum: Role, default: Role.client })
   role: Role;
 
-  // @OneToMany(() => Order, (order) => order.user)
-  // orders: Order[];
+  @OneToMany(() => Address, (address) => address.user)
+  addresses: Address[];
+
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Order[];
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
   createdAt: Date;

@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+
+import { Subcategory } from './subcategory.entity';
 
 @Entity('categories')
 export class Category {
@@ -10,6 +12,9 @@ export class Category {
 
   // @OneToMany(() => Product, (products) => products.category)
   // products: Product[];
+
+  @OneToMany(() => Subcategory, (subcategory) => subcategory.category)
+  subcategories: Subcategory[];
 
   // @BeforeInsert()
   // capitalizeName() {

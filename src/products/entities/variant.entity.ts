@@ -3,9 +3,14 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
+import { Color } from './color.entity';
+import { Product } from './product.entity';
+import { Size } from './size.entity';
 
 @Entity('variants')
 export class Variant {
@@ -35,14 +40,14 @@ export class Variant {
   // @OneToMany(() => VariantInOrder, (variantInOrder) => variantInOrder.variant)
   // variantInOrder: VariantInOrder[];
 
-  // @ManyToOne(() => Size, (size) => size.variants)
-  // size: Size;
+  @ManyToOne(() => Size, (size) => size.variants, { nullable: false })
+  size: Size;
 
-  // @ManyToOne(() => Color, (color) => color.variants)
-  // color?: Color;
+  @ManyToOne(() => Color, (color) => color.variants, { nullable: true })
+  color?: Color;
 
-  // @ManyToOne(() => Product, (product) => product.variants)
-  // product: Product;
+  @ManyToOne(() => Product, (product) => product.variants, { nullable: false })
+  product: Product;
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
   createdAt: Date;

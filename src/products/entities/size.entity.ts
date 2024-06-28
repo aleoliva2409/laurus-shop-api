@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+
+import { Variant } from './variant.entity';
 
 @Entity('sizes')
 export class Size {
@@ -14,6 +16,6 @@ export class Size {
   @Column('integer')
   order: number;
 
-  // @OneToMany(() => Variant, (variant) => variant.size)
-  // variants: Variant[];
+  @OneToMany(() => Variant, (variant) => variant.size)
+  variants: Variant[];
 }

@@ -1,19 +1,20 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-// import { Category } from './category.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+
+import { Category } from './category.entity';
 
 @Entity('subcategories')
-export class SubCategory {
+export class Subcategory {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
   @Column('varchar', { length: 20 })
   name: string;
 
-  //TODO: to add relation
-  // category: Category;
-
   // @OneToMany(() => Product, (products) => products.category)
   // products: Product[];
+
+  @ManyToOne(() => Category, (category) => category.subcategories, { nullable: false })
+  category: Category;
 
   // @BeforeInsert()
   // capitalizeName() {

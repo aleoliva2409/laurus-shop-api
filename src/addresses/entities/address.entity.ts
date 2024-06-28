@@ -1,4 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+
+import { Order } from '../../orders/entities/order.entity';
+import { Province } from './province.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('addresses')
 export class Address {
@@ -24,9 +28,6 @@ export class Address {
   zipCode: string;
 
   @Column('varchar', { length: 25 })
-  province: string; //TODO: Province Id
-
-  @Column('varchar', { length: 25 })
   city: string;
 
   @Column('varchar', { length: 25, nullable: true })
@@ -41,6 +42,15 @@ export class Address {
   @Column('varchar', { length: 128, nullable: true })
   observations?: string;
 
-  // @Column('')
+  @OneToMany(() => Order, (order) => order.address)
+  orders: Order[];
+
+  @ManyToOne(() => Province, (province) => province.addresses, { nullable: false })
+  province: Province;
+
+  @ManyToOne(() => User, (user) => user.addresses, { nullable: false })
+  user: User;
+
+  // @OneToMany(() => User, (user) => user.addresses)
   // user: User;
 }
