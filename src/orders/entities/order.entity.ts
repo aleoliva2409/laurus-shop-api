@@ -11,7 +11,7 @@ import {
 
 import { OrderStatus } from '../../shared/types';
 
-import { Address, User } from 'src/users/entities';
+import { Address, User } from '../../users/entities';
 import { VariantInOrder } from './variant-in-order.entity';
 
 @Entity('orders')
