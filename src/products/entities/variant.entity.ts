@@ -4,6 +4,7 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -11,6 +12,7 @@ import {
 import { Color } from './color.entity';
 import { Product } from './product.entity';
 import { Size } from './size.entity';
+import { VariantInOrder } from '../../orders/entities';
 
 @Entity('variants')
 export class Variant {
@@ -37,8 +39,8 @@ export class Variant {
   // @Column('text', { array: true, default: [] })
   // images?: string[] = [];
 
-  // @OneToMany(() => VariantInOrder, (variantInOrder) => variantInOrder.variant)
-  // variantInOrder: VariantInOrder[];
+  @OneToMany(() => VariantInOrder, (variantInOrder) => variantInOrder.variant)
+  variantInOrder: VariantInOrder[];
 
   @ManyToOne(() => Size, (size) => size.variants, { nullable: false })
   size: Size;

@@ -10,8 +10,8 @@ import {
 
 import { Role } from '../../shared/types';
 
-import { Address } from '../../addresses/entities';
-import { Order } from '../../orders/entities/order.entity';
+import { Address } from './address.entity';
+import { Order } from '../../orders/entities';
 
 @Entity('users')
 export class User {

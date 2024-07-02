@@ -3,11 +3,13 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
+import { Category, Subcategory } from '../../categories/entities';
 import { Variant } from './variant.entity';
 
 @Entity('products')
@@ -40,14 +42,20 @@ export class Product {
 
   @Column('boolean', { name: 'is_visible', default: true })
   isVisible: boolean;
+
   // @Column('varchar', { length: 15, array: true, default: [] })
   // tags?: string[];
 
   // @Column('enum', { enum: SizeType, name: 'size_type' })
   // sizeType: SizeType;
 
-  // @ManyToOne(() => Category, (category) => category.products)
-  // category: Category;
+  @ManyToOne(() => Category, (category) => category.products, { nullable: false })
+  category: Category;
+
+  @ManyToOne(() => Subcategory, (subcategory) => subcategory.products, {
+    nullable: false,
+  })
+  subcategory: Subcategory;
 
   @OneToMany(() => Variant, (variant) => variant.product)
   variants: Variant[];

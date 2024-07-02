@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
+import { Product } from '../../products/entities';
 import { Subcategory } from './subcategory.entity';
 
 @Entity('categories')
@@ -10,8 +11,8 @@ export class Category {
   @Column('varchar', { length: 20 })
   name: string;
 
-  // @OneToMany(() => Product, (products) => products.category)
-  // products: Product[];
+  @OneToMany(() => Product, (products) => products.category)
+  products: Product[];
 
   @OneToMany(() => Subcategory, (subcategory) => subcategory.category)
   subcategories: Subcategory[];

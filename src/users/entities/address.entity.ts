@@ -1,8 +1,8 @@
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
-import { Order } from '../../orders/entities/order.entity';
+import { Order } from '../../orders/entities';
 import { Province } from './province.entity';
-import { User } from '../../users/entities/user.entity';
+import { User } from './user.entity';
 
 @Entity('addresses')
 export class Address {
