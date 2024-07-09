@@ -34,6 +34,10 @@ export class Order {
   @Column('enum', { enum: OrderStatus, default: OrderStatus.pendingToPay })
   status: OrderStatus;
 
+  //TODO: add payType
+  // @Column('enum', { enum: OrderStatus, default: OrderStatus.pendingToPay })
+  // payType: payType;
+
   // @Column('decimal', {
   //   name: 'sub_total',
   //   precision: 10,

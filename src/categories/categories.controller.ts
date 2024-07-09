@@ -1,34 +1,77 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+  Query,
+  ParseBoolPipe,
+} from '@nestjs/common';
+
 import { CategoriesService } from './categories.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CreateCategoryDto, UpdateCategoryDto, UpdateSubcategoryDto } from './dto';
 
 @Controller('categories')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Post()
-  create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoriesService.create(createCategoryDto);
+  createCategory(@Body() createCategoryDto: CreateCategoryDto) {
+    return this.categoriesService.createCategory(createCategoryDto);
+  }
+
+  @Post(':categoryId/subcategories')
+  createSubcategory(
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+    @Body() createSubcategoryDto: CreateCategoryDto,
+  ) {
+    return this.categoriesService.createSubcategory(categoryId, createSubcategoryDto);
   }
 
   @Get()
-  findAll() {
-    return this.categoriesService.findAll();
+  findAll(@Query('children', ParseBoolPipe) children: boolean) {
+    return this.categoriesService.findAll(children);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.categoriesService.findOne(+id);
+  @Get(':categoryId')
+  findOne(@Param('categoryId', ParseIntPipe) categoryId: number) {
+    return this.categoriesService.findCategory(categoryId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
-    return this.categoriesService.update(+id, updateCategoryDto);
+  @Patch(':categoryId')
+  updateCategory(
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+    @Body() UpdateSubcategoryDto: UpdateCategoryDto,
+  ) {
+    return this.categoriesService.updateCategory(categoryId, UpdateSubcategoryDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.categoriesService.remove(+id);
+  @Patch(':categoryId/subcategories/:subcategoryId')
+  updateSubcategory(
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+    @Param('subcategoryId', ParseIntPipe) subcategoryId: number,
+    @Body() updateSubcategoryDto: UpdateSubcategoryDto,
+  ) {
+    return this.categoriesService.updateSubcategory(
+      categoryId,
+      subcategoryId,
+      updateSubcategoryDto,
+    );
+  }
+
+  @Delete(':categoryId')
+  removeCategory(@Param('categoryId', ParseIntPipe) categoryId: number) {
+    return this.categoriesService.removeCategory(categoryId);
+  }
+
+  @Delete(':categoryId/subcategories/:subcategoryId')
+  removeSubcategory(
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+    @Param('subcategoryId', ParseIntPipe) subcategoryId: number,
+  ) {
+    return this.categoriesService.removeSubcategory(categoryId, subcategoryId);
   }
 }
