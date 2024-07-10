@@ -1,5 +1,6 @@
 import {
   BeforeInsert,
+  BeforeUpdate,
   Column,
   Entity,
   ManyToOne,
@@ -26,6 +27,7 @@ export class Subcategory {
   category: Category;
 
   @BeforeInsert()
+  @BeforeUpdate()
   capitalizeName() {
     this.name = capitalize(this.name);
   }

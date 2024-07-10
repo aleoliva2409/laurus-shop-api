@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { DeleteResult, FindOptionsRelations, Repository, UpdateResult } from 'typeorm';
 
 import { CreateCategoryDto, UpdateCategoryDto } from './dto';
 import { Category, Subcategory } from './entities';
-import { capitalize, validateError } from 'src/shared/utils';
+import { validateError } from 'src/shared/utils';
 
 @Injectable()
 export class CategoriesService {
@@ -18,9 +18,8 @@ export class CategoriesService {
 
   async createCategory(createCategoryDto: CreateCategoryDto): Promise<void> {
     try {
-      const { name } = createCategoryDto;
-
-      const category = this.categoriesRepository.create({ name }); //? use "entityManager.create" because @BeforeInsert doesn't work
+      //? use "entityManager.create" because @BeforeInsert doesn't work
+      const category = this.categoriesRepository.create(createCategoryDto);
 
       await this.categoriesRepository.save(category);
     } catch (error) {
@@ -36,7 +35,7 @@ export class CategoriesService {
       await this.findCategory(categoryId);
 
       const subcategory = this.subcategoriesRepository.create({
-        name: createSubcategoryDto.name,
+        ...createSubcategoryDto,
         category: { id: categoryId },
       });
 
@@ -57,12 +56,15 @@ export class CategoriesService {
     }
   }
 
-  async findCategory(id: number): Promise<Category> {
+  async findCategory(id: number, relations?: FindOptionsRelations<Category>): Promise<Category> {
     try {
-      const category = await this.categoriesRepository.findOneBy({ id });
+      const category = await this.categoriesRepository.findOne({
+        where: { id },
+        relations,
+      });
 
       if (!category) {
-        throw new NotFoundException(`Cannot find category with id ${id}`);
+        throw new BadRequestException(`Cannot find category with id ${id}`);
       }
 
       return category;
@@ -73,11 +75,14 @@ export class CategoriesService {
 
   async updateCategory(id: number, updateCategoryDto: UpdateCategoryDto): Promise<UpdateResult> {
     try {
-      const { name } = updateCategoryDto;
-
       await this.findCategory(id);
 
-      return await this.categoriesRepository.update(id, { name: capitalize(name) });
+      //? use "entityManager.create" because @BeforeUpdate doesn't work
+      const category = this.categoriesRepository.create({
+        ...updateCategoryDto,
+      });
+
+      return await this.categoriesRepository.update(id, category);
     } catch (error) {
       validateError(error);
     }
@@ -86,16 +91,24 @@ export class CategoriesService {
   async updateSubcategory(
     categoryId: number,
     subcategoryId: number,
-    updateCategoryDto: UpdateCategoryDto,
+    updateSubcategory: UpdateCategoryDto,
   ): Promise<UpdateResult> {
     try {
-      const { name } = updateCategoryDto;
+      const category = await this.findCategory(categoryId, { subcategories: true });
 
-      await this.findCategory(categoryId);
+      const existSubcategory = category.subcategories.find(
+        (subcategory) => subcategory.id === subcategoryId,
+      );
 
-      return await this.subcategoriesRepository.update(subcategoryId, {
-        name: capitalize(name),
+      if (!existSubcategory) {
+        throw new BadRequestException(`Subcategory does not link with category ${category.name}`);
+      }
+
+      const subcategory = this.subcategoriesRepository.create({
+        ...updateSubcategory,
       });
+
+      return await this.subcategoriesRepository.update(subcategoryId, subcategory);
     } catch (error) {
       validateError(error);
     }
@@ -113,7 +126,15 @@ export class CategoriesService {
 
   async removeSubcategory(categoryId: number, subcategoryId: number): Promise<DeleteResult> {
     try {
-      await this.findCategory(categoryId);
+      const category = await this.findCategory(categoryId, { subcategories: true });
+
+      const existSubcategory = category.subcategories.find(
+        (subcategory) => subcategory.id === subcategoryId,
+      );
+
+      if (!existSubcategory) {
+        throw new BadRequestException(`Subcategory does not link with category ${category.name}`);
+      }
 
       return await this.subcategoriesRepository.delete(subcategoryId);
     } catch (error) {

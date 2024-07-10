@@ -1,4 +1,11 @@
-import { BeforeInsert, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { Product } from '../../products/entities';
 import { Subcategory } from './subcategory.entity';
@@ -19,6 +26,7 @@ export class Category {
   subcategories: Subcategory[];
 
   @BeforeInsert()
+  @BeforeUpdate()
   capitalizeName() {
     this.name = capitalize(this.name);
   }
