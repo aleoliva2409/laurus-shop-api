@@ -5,7 +5,7 @@ import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
 import { CreateCategoryDto, UpdateCategoryDto } from './dto';
 import { Category, Subcategory } from './entities';
-import { capitalize } from 'src/shared/utils';
+import { capitalize, validateError } from 'src/shared/utils';
 
 @Injectable()
 export class CategoriesService {
@@ -19,9 +19,12 @@ export class CategoriesService {
   async createCategory(createCategoryDto: CreateCategoryDto): Promise<void> {
     try {
       const { name } = createCategoryDto;
-      await this.categoriesRepository.save({ name: capitalize(name) });
+
+      const category = this.categoriesRepository.create({ name }); //? use "entityManager.create" because @BeforeInsert doesn't work
+
+      await this.categoriesRepository.save(category);
     } catch (error) {
-      //validateError(error);
+      validateError(error);
     }
   }
 
@@ -32,12 +35,14 @@ export class CategoriesService {
     try {
       await this.findCategory(categoryId);
 
-      await this.subcategoriesRepository.save({
-        name: capitalize(createSubcategoryDto.name),
+      const subcategory = this.subcategoriesRepository.create({
+        name: createSubcategoryDto.name,
         category: { id: categoryId },
       });
+
+      await this.subcategoriesRepository.save(subcategory);
     } catch (error) {
-      //validateError(error);
+      validateError(error);
     }
   }
 
@@ -48,7 +53,7 @@ export class CategoriesService {
         relations: { subcategories: children },
       });
     } catch (error) {
-      //validateError(error);
+      validateError(error);
     }
   }
 
@@ -62,7 +67,7 @@ export class CategoriesService {
 
       return category;
     } catch (error) {
-      //validateError(error);
+      validateError(error);
     }
   }
 
@@ -74,7 +79,7 @@ export class CategoriesService {
 
       return await this.categoriesRepository.update(id, { name: capitalize(name) });
     } catch (error) {
-      //validateError(error);
+      validateError(error);
     }
   }
 
@@ -92,7 +97,7 @@ export class CategoriesService {
         name: capitalize(name),
       });
     } catch (error) {
-      //validateError(error);
+      validateError(error);
     }
   }
 
@@ -102,7 +107,7 @@ export class CategoriesService {
 
       return await this.categoriesRepository.delete(id);
     } catch (error) {
-      //validateError(error);
+      validateError(error);
     }
   }
 
@@ -112,7 +117,7 @@ export class CategoriesService {
 
       return await this.subcategoriesRepository.delete(subcategoryId);
     } catch (error) {
-      //validateError(error);
+      validateError(error);
     }
   }
 

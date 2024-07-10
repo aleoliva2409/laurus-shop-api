@@ -1,14 +1,22 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { Category } from './category.entity';
 import { Product } from '../../products/entities';
+import { capitalize } from '../../shared/utils';
 
 @Entity('subcategories')
 export class Subcategory {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column('varchar', { length: 20 })
+  @Column('varchar', { length: 20, unique: true })
   name: string;
 
   @OneToMany(() => Product, (products) => products.category)
@@ -17,8 +25,8 @@ export class Subcategory {
   @ManyToOne(() => Category, (category) => category.subcategories, { nullable: false })
   category: Category;
 
-  // @BeforeInsert()
-  // capitalizeName() {
-  //   this.name = this.name[0].toUpperCase() + this.name.slice(1).toLocaleLowerCase();
-  // }
+  @BeforeInsert()
+  capitalizeName() {
+    this.name = capitalize(this.name);
+  }
 }
