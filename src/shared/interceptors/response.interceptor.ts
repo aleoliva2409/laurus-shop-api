@@ -2,12 +2,14 @@ import {
   CallHandler,
   ExecutionContext,
   HttpException,
-  HttpStatus,
   Injectable,
+  InternalServerErrorException,
   NestInterceptor,
 } from '@nestjs/common';
 
 import { Observable, catchError, map, throwError } from 'rxjs';
+
+import { ResponseError, Response } from '../types/interfaces';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
@@ -20,19 +22,29 @@ export class ResponseInterceptor implements NestInterceptor {
 
   errorHandler(exception: HttpException, context: ExecutionContext) {
     const ctx = context.switchToHttp();
-    const response = ctx.getResponse();
     const request = ctx.getRequest();
+    const response = ctx.getResponse();
 
-    const status =
-      exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
+    const resFormat: Response<null> = {
+      meta: {
+        url: request.url,
+        status: false,
+        statusCode: exception.getStatus(),
+      },
+      data: null,
+      error: exception.getResponse() as ResponseError,
+    };
 
-    response.status(status).json({
-      status: false,
-      statusCode: status,
-      path: request.url,
-      message: exception.message,
-      result: exception,
-    });
+    if (exception instanceof InternalServerErrorException) {
+      resFormat.error = {
+        details: exception.getResponse(),
+        message: exception.message,
+        statusCode: exception.getStatus(),
+        error: 'Internal server error',
+      };
+    }
+
+    response.status(exception.getStatus()).json(resFormat);
   }
 
   responseHandler(res: any, context: ExecutionContext) {
@@ -43,10 +55,13 @@ export class ResponseInterceptor implements NestInterceptor {
     const statusCode = response.statusCode;
 
     return {
-      status: true,
-      path: request.url,
-      statusCode,
-      result: res,
+      meta: {
+        url: request.url,
+        status: true,
+        statusCode,
+      },
+      data: res,
+      error: null,
     };
   }
 }
