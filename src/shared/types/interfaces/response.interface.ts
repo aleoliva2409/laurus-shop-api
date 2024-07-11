@@ -14,7 +14,7 @@ export interface Metadata {
 
 export interface ResponseError {
   message: string | string[];
-  statusCode: HttpStatus;
+  code: HttpStatus;
   error: any;
   details?: any;
 }

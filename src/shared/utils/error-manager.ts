@@ -1,27 +1,20 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  InternalServerErrorException,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, InternalServerErrorException } from '@nestjs/common';
 
-export const validateError = (error) => {
-  if (error instanceof NotFoundException) {
-    throw new NotFoundException(error.message);
+export const errorManager = (error: unknown) => {
+  if (error instanceof HttpException) {
+    throw new HttpException(
+      {
+        message: error.message,
+        code: error.getStatus(),
+        error: error.getResponse()['error'],
+      },
+      error.getStatus(),
+    );
   }
 
-  if (error instanceof BadRequestException) {
-    throw new BadRequestException(error.message);
-  }
-
-  if (error instanceof ForbiddenException) {
-    throw new ForbiddenException(error.message);
-  }
-
-  if (error instanceof UnauthorizedException) {
-    throw new UnauthorizedException(error).message;
-  }
-
-  throw new InternalServerErrorException(error);
+  throw new InternalServerErrorException({
+    message: 'Check logs for more details',
+    code: HttpStatus.INTERNAL_SERVER_ERROR,
+    error: 'Internal Server Error',
+  });
 };

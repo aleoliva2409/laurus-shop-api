@@ -5,7 +5,7 @@ import { DeleteResult, FindOptionsRelations, Repository, UpdateResult } from 'ty
 
 import { CreateCategoryDto, UpdateCategoryDto } from './dto';
 import { Category, Subcategory } from './entities';
-import { validateError } from 'src/shared/utils';
+import { errorManager } from 'src/shared/utils';
 
 @Injectable()
 export class CategoriesService {
@@ -23,7 +23,7 @@ export class CategoriesService {
 
       await this.categoriesRepository.save(category);
     } catch (error) {
-      validateError(error);
+      errorManager(error);
     }
   }
 
@@ -41,7 +41,7 @@ export class CategoriesService {
 
       await this.subcategoriesRepository.save(subcategory);
     } catch (error) {
-      validateError(error);
+      errorManager(error);
     }
   }
 
@@ -52,7 +52,7 @@ export class CategoriesService {
         relations: { subcategories: children },
       });
     } catch (error) {
-      validateError(error);
+      errorManager(error);
     }
   }
 
@@ -69,7 +69,7 @@ export class CategoriesService {
 
       return category;
     } catch (error) {
-      validateError(error);
+      errorManager(error);
     }
   }
 
@@ -84,7 +84,7 @@ export class CategoriesService {
 
       return await this.categoriesRepository.update(id, category);
     } catch (error) {
-      validateError(error);
+      errorManager(error);
     }
   }
 
@@ -110,7 +110,7 @@ export class CategoriesService {
 
       return await this.subcategoriesRepository.update(subcategoryId, subcategory);
     } catch (error) {
-      validateError(error);
+      errorManager(error);
     }
   }
 
@@ -120,7 +120,7 @@ export class CategoriesService {
 
       return await this.categoriesRepository.delete(id);
     } catch (error) {
-      validateError(error);
+      errorManager(error);
     }
   }
 
@@ -138,7 +138,7 @@ export class CategoriesService {
 
       return await this.subcategoriesRepository.delete(subcategoryId);
     } catch (error) {
-      validateError(error);
+      errorManager(error);
     }
   }
 

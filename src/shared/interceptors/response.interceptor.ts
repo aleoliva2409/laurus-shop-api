@@ -3,13 +3,11 @@ import {
   ExecutionContext,
   HttpException,
   Injectable,
-  InternalServerErrorException,
   NestInterceptor,
 } from '@nestjs/common';
 
+import { Request, Response } from 'express';
 import { Observable, catchError, map, throwError } from 'rxjs';
-
-import { ResponseError, Response } from '../types/interfaces';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
@@ -22,29 +20,18 @@ export class ResponseInterceptor implements NestInterceptor {
 
   errorHandler(exception: HttpException, context: ExecutionContext) {
     const ctx = context.switchToHttp();
-    const request = ctx.getRequest();
-    const response = ctx.getResponse();
+    const request = ctx.getRequest<Request>();
+    const response = ctx.getResponse<Response>();
 
-    const resFormat: Response<null> = {
+    response.status(exception.getStatus()).json({
       meta: {
         url: request.url,
         status: false,
         statusCode: exception.getStatus(),
       },
       data: null,
-      error: exception.getResponse() as ResponseError,
-    };
-
-    if (exception instanceof InternalServerErrorException) {
-      resFormat.error = {
-        details: exception.getResponse(),
-        message: exception.message,
-        statusCode: exception.getStatus(),
-        error: 'Internal server error',
-      };
-    }
-
-    response.status(exception.getStatus()).json(resFormat);
+      error: exception.getResponse(),
+    });
   }
 
   responseHandler(res: any, context: ExecutionContext) {
