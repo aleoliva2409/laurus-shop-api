@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Query,
   ParseBoolPipe,
+  HttpStatus,
 } from '@nestjs/common';
 import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -20,13 +21,13 @@ import { CategoryDto, CreateCategoryDto, UpdateCategoryDto } from './dto';
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
-  @ApiResponse({ status: 201, description: 'Category created' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Category created' })
   @Post()
   createCategory(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoriesService.createCategory(createCategoryDto);
   }
 
-  @ApiResponse({ status: 201, description: 'Subcategory created' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Subcategory created' })
   @Post(':categoryId/subcategories')
   createSubcategory(
     @Param('categoryId', ParseIntPipe) categoryId: number,
@@ -35,20 +36,25 @@ export class CategoriesController {
     return this.categoriesService.createSubcategory(categoryId, createSubcategoryDto);
   }
 
-  @ApiResponse({ status: 200, description: 'Get all categories', type: CategoryDto, isArray: true })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Get all categories',
+    type: CategoryDto,
+    isArray: true,
+  })
   @ApiQuery({ name: 'children', type: Boolean, required: true })
   @Get()
   findAll(@Query('children', ParseBoolPipe) children: boolean) {
     return this.categoriesService.findAll(children);
   }
 
-  @ApiResponse({ status: 200, description: 'Get category by ID', type: CategoryDto })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Get category by ID', type: CategoryDto })
   @Get(':categoryId')
   findOne(@Param('categoryId', ParseIntPipe) categoryId: number) {
     return this.categoriesService.findCategory(categoryId);
   }
 
-  @ApiResponse({ status: 200, description: 'Update category by ID' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Update category by ID' })
   @Patch(':categoryId')
   updateCategory(
     @Param('categoryId', ParseIntPipe) categoryId: number,
@@ -57,7 +63,7 @@ export class CategoriesController {
     return this.categoriesService.updateCategory(categoryId, updateSubcategoryDto);
   }
 
-  @ApiResponse({ status: 200, description: 'Update subcategory by ID' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Update subcategory by ID' })
   @Patch(':categoryId/subcategories/:subcategoryId')
   updateSubcategory(
     @Param('categoryId', ParseIntPipe) categoryId: number,
@@ -71,13 +77,13 @@ export class CategoriesController {
     );
   }
 
-  @ApiResponse({ status: 200, description: 'Delete category by ID' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Delete category by ID' })
   @Delete(':categoryId')
   removeCategory(@Param('categoryId', ParseIntPipe) categoryId: number) {
     return this.categoriesService.removeCategory(categoryId);
   }
 
-  @ApiResponse({ status: 200, description: 'Delete subcategory by ID' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Delete subcategory by ID' })
   @Delete(':categoryId/subcategories/:subcategoryId')
   removeSubcategory(
     @Param('categoryId', ParseIntPipe) categoryId: number,
