@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
+import { SizeType } from '../../shared/types';
 import { Variant } from './variant.entity';
 
 @Entity('sizes')
@@ -10,8 +11,8 @@ export class Size {
   @Column('varchar', { length: 5 })
   name: string;
 
-  // @Column('enum', { enum: SizeType })
-  // type: SizeType;
+  @Column('enum', { enum: SizeType })
+  type: SizeType;
 
   @Column('integer')
   order: number;
