@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 
 import { Category, Subcategory } from '../../categories/entities';
+import { SizeType } from '../../shared/types';
 import { Variant } from './variant.entity';
 
 @Entity('products')
@@ -46,8 +47,8 @@ export class Product {
   // @Column('varchar', { length: 15, array: true, default: [] })
   // tags?: string[];
 
-  // @Column('enum', { enum: SizeType, name: 'size_type' })
-  // sizeType: SizeType;
+  @Column('enum', { enum: SizeType, name: 'size_type' })
+  sizeType: SizeType;
 
   @ManyToOne(() => Category, (category) => category.products, { nullable: false })
   category: Category;
