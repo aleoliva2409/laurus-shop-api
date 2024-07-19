@@ -1,4 +1,6 @@
 import {
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
@@ -69,4 +71,24 @@ export class Product {
 
   @DeleteDateColumn({ type: 'timestamp', name: 'deleted_at' })
   deletedAt: Date;
+
+  @BeforeInsert()
+  insertSlug() {
+    if (!this.slug) this.slug = this.title;
+
+    this.slug = this.slug
+      .toLowerCase()
+      .replaceAll(' ', '_')
+      .replaceAll("'", '')
+      .replaceAll('.', '');
+  }
+
+  @BeforeUpdate()
+  checkSlug() {
+    this.slug = this.slug
+      .toLowerCase()
+      .replaceAll(' ', '_')
+      .replaceAll("'", '')
+      .replaceAll('.', '');
+  }
 }
