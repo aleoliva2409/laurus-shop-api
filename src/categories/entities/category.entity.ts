@@ -8,7 +8,6 @@ import {
 } from 'typeorm';
 
 import { Product } from '../../products/entities';
-import { Subcategory } from './subcategory.entity';
 import { capitalize } from '../../shared/utils';
 
 @Entity('categories')
@@ -19,11 +18,11 @@ export class Category {
   @Column('varchar', { length: 20, unique: true })
   name: string;
 
+  @Column('integer', { nullable: true, name: 'parent_id', default: null })
+  parentId?: number;
+
   @OneToMany(() => Product, (products) => products.category)
   products: Product[];
-
-  @OneToMany(() => Subcategory, (subcategory) => subcategory.category)
-  subcategories: Subcategory[];
 
   @BeforeInsert()
   @BeforeUpdate()

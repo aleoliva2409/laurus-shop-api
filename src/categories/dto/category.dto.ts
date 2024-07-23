@@ -6,13 +6,21 @@ export class SubcategoryDto {
 
   @ApiProperty({ example: 'Electronics' })
   name: string;
+
+  @ApiProperty({ example: 1 })
+  parentId: number;
 }
 
-export class CategoryDto extends SubcategoryDto {
-  @ApiPropertyOptional({
-    isArray: true,
-    type: SubcategoryDto,
-    example: [{ id: 4, name: 'Computers' }],
-  })
-  subcategories: SubcategoryDto[];
+export class CategoryDto {
+  @ApiProperty({ example: 1 })
+  id: number;
+
+  @ApiProperty({ example: 'Electronics' })
+  name: string;
+
+  @ApiPropertyOptional({ nullable: true })
+  parentId?: number;
+
+  @ApiPropertyOptional({ isArray: true, type: SubcategoryDto })
+  subcategories?: SubcategoryDto[];
 }

@@ -31,9 +31,9 @@ export class CategoriesController {
   @Post(':categoryId/subcategories')
   createSubcategory(
     @Param('categoryId', ParseIntPipe) categoryId: number,
-    @Body() createSubcategoryDto: CreateCategoryDto,
+    @Body() createCategoryDto: CreateCategoryDto,
   ) {
-    return this.categoriesService.createSubcategory(categoryId, createSubcategoryDto);
+    return this.categoriesService.createCategory(createCategoryDto, categoryId);
   }
 
   @ApiResponse({
@@ -50,8 +50,11 @@ export class CategoriesController {
 
   @ApiResponse({ status: HttpStatus.OK, description: 'Get category by ID', type: CategoryDto })
   @Get(':categoryId')
-  findOne(@Param('categoryId', ParseIntPipe) categoryId: number) {
-    return this.categoriesService.findCategory(categoryId);
+  findOne(
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+    @Query('children', ParseBoolPipe) children: boolean,
+  ) {
+    return this.categoriesService.findCategory(categoryId, children);
   }
 
   @ApiResponse({ status: HttpStatus.OK, description: 'Update category by ID' })
@@ -63,7 +66,7 @@ export class CategoriesController {
     return this.categoriesService.updateCategory(categoryId, updateSubcategoryDto);
   }
 
-  @ApiResponse({ status: HttpStatus.OK, description: 'Update subcategory by ID' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Update category by ID' })
   @Patch(':categoryId/subcategories/:subcategoryId')
   updateSubcategory(
     @Param('categoryId', ParseIntPipe) categoryId: number,

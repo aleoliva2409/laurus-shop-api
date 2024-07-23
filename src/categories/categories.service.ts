@@ -1,10 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { DeleteResult, FindOptionsRelations, Repository, UpdateResult } from 'typeorm';
+import { DataSource, DeleteResult, IsNull, Repository, UpdateResult } from 'typeorm';
 
-import { CreateCategoryDto, UpdateCategoryDto } from './dto';
-import { Category, Subcategory } from './entities';
+import { CategoryDto, CreateCategoryDto, SubcategoryDto, UpdateCategoryDto } from './dto';
+import { Category } from './entities';
 import { errorManager } from 'src/shared/utils';
 
 @Injectable()
@@ -12,14 +12,20 @@ export class CategoriesService {
   constructor(
     @InjectRepository(Category)
     private readonly categoriesRepository: Repository<Category>,
-    @InjectRepository(Subcategory)
-    private readonly subcategoriesRepository: Repository<Subcategory>,
+    private readonly dataSource: DataSource,
   ) {}
 
-  async createCategory(createCategoryDto: CreateCategoryDto): Promise<void> {
+  async createCategory(createCategoryDto: CreateCategoryDto, parentId?: number): Promise<void> {
     try {
       //? use "entityManager.create" because @BeforeInsert doesn't work
-      const category = this.categoriesRepository.create(createCategoryDto);
+      let category: Category;
+
+      if (parentId) {
+        await this.findOne(parentId);
+        category = this.categoriesRepository.create({ ...createCategoryDto, parentId });
+      } else {
+        category = this.categoriesRepository.create(createCategoryDto);
+      }
 
       await this.categoriesRepository.save(category);
     } catch (error) {
@@ -27,47 +33,36 @@ export class CategoriesService {
     }
   }
 
-  async createSubcategory(
-    categoryId: number,
-    createSubcategoryDto: CreateCategoryDto,
-  ): Promise<void> {
+  async findAll(children: boolean): Promise<CategoryDto[]> {
     try {
-      await this.findCategory(categoryId);
-
-      const subcategory = this.subcategoriesRepository.create({
-        ...createSubcategoryDto,
-        category: { id: categoryId },
-      });
-
-      await this.subcategoriesRepository.save(subcategory);
-    } catch (error) {
-      errorManager(error);
-    }
-  }
-
-  async findAll(children: boolean): Promise<Category[]> {
-    try {
-      return await this.categoriesRepository.find({
+      const categories = await this.categoriesRepository.find({
+        where: { parentId: IsNull() },
         order: { name: 'asc' },
-        relations: { subcategories: children },
-      });
-    } catch (error) {
-      errorManager(error);
-    }
-  }
-
-  async findCategory(id: number, relations?: FindOptionsRelations<Category>): Promise<Category> {
-    try {
-      const category = await this.categoriesRepository.findOne({
-        where: { id },
-        relations,
       });
 
-      if (!category) {
-        throw new BadRequestException(`Cannot find category with id ${id}`);
+      if (children) {
+        const categoriesWithSubcategories = await this.mapperSubcategories(categories);
+
+        return categoriesWithSubcategories;
       }
 
-      return category;
+      return this.mapperCategories(categories);
+    } catch (error) {
+      errorManager(error);
+    }
+  }
+
+  async findCategory(id: number, children: boolean = false): Promise<CategoryDto> {
+    try {
+      const category = await this.findOne(id);
+
+      if (children) {
+        const categoriesWithSubcategories = await this.mapperSubcategories([category]);
+
+        return categoriesWithSubcategories[0];
+      }
+
+      return this.mapperCategories(category);
     } catch (error) {
       errorManager(error);
     }
@@ -75,7 +70,7 @@ export class CategoriesService {
 
   async updateCategory(id: number, updateCategoryDto: UpdateCategoryDto): Promise<UpdateResult> {
     try {
-      await this.findCategory(id);
+      await this.findOne(id);
 
       //? use "entityManager.create" because @BeforeUpdate doesn't work
       const category = this.categoriesRepository.create({
@@ -91,55 +86,113 @@ export class CategoriesService {
   async updateSubcategory(
     categoryId: number,
     subcategoryId: number,
-    updateSubcategory: UpdateCategoryDto,
+    updateCategoryDto: UpdateCategoryDto,
   ): Promise<UpdateResult> {
     try {
-      const category = await this.findCategory(categoryId, { subcategories: true });
+      const subcategory = await this.findOne(subcategoryId);
 
-      const existSubcategory = category.subcategories.find(
-        (subcategory) => subcategory.id === subcategoryId,
-      );
-
-      if (!existSubcategory) {
-        throw new BadRequestException(`Subcategory does not link with category ${category.name}`);
+      if (subcategory.parentId !== categoryId) {
+        throw new BadRequestException(
+          "Cannot update subcategory under its parent category. There's no match.",
+        );
       }
 
-      const subcategory = this.subcategoriesRepository.create({
-        ...updateSubcategory,
+      //? use "entityManager.create" because @BeforeUpdate doesn't work
+      const subcategoryToUpdate = this.categoriesRepository.create({
+        ...updateCategoryDto,
+        parentId: categoryId,
       });
 
-      return await this.subcategoriesRepository.update(subcategoryId, subcategory);
+      return await this.categoriesRepository.update(subcategoryId, subcategoryToUpdate);
     } catch (error) {
       errorManager(error);
     }
   }
 
-  async removeCategory(id: number): Promise<DeleteResult> {
+  async removeCategory(id: number): Promise<void> {
+    const queryRunner = this.categoriesRepository.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
     try {
-      await this.findCategory(id);
+      await this.findOne(id);
 
-      return await this.categoriesRepository.delete(id);
+      //??? manager has all methods
+      // await queryRunner.manager.delete(Category, id);
+
+      // ??? many forms to delete multiple rows at once
+      // await queryRunner.manager.delete(Category, { parentId: id });
+      // await queryRunner.query(`DELETE FROM categories WHERE parent_id = ${id} or id = ${id}`);
+
+      await queryRunner.query('DELETE FROM categories WHERE parent_id = $1 or id = $1', [id]);
+
+      await queryRunner.commitTransaction();
     } catch (error) {
+      await queryRunner.rollbackTransaction();
       errorManager(error);
+    } finally {
+      await queryRunner.release();
     }
   }
 
   async removeSubcategory(categoryId: number, subcategoryId: number): Promise<DeleteResult> {
     try {
-      const category = await this.findCategory(categoryId, { subcategories: true });
+      const subcategory = await this.findOne(subcategoryId);
 
-      const existSubcategory = category.subcategories.find(
-        (subcategory) => subcategory.id === subcategoryId,
-      );
-
-      if (!existSubcategory) {
-        throw new BadRequestException(`Subcategory does not link with category ${category.name}`);
+      if (subcategory.parentId !== categoryId) {
+        throw new BadRequestException(
+          "Cannot remove subcategory under its parent category. There's no match.",
+        );
       }
 
-      return await this.subcategoriesRepository.delete(subcategoryId);
+      return await this.categoriesRepository.delete(subcategoryId);
     } catch (error) {
       errorManager(error);
     }
+  }
+
+  async findOne(id: number): Promise<Category> {
+    try {
+      const category = await this.categoriesRepository.findOneBy({ id });
+
+      if (!category) throw new NotFoundException(`Cannot find category with id ${id}`);
+
+      return category;
+    } catch (error) {
+      errorManager(error);
+    }
+  }
+
+  mapperCategories(categories: Category): CategoryDto;
+  mapperCategories(categories: Category[]): CategoryDto[];
+  mapperCategories(categories: Category | Category[]): CategoryDto | CategoryDto[] {
+    if (Array.isArray(categories)) {
+      return categories.map(({ id, name }) => ({ id, name }));
+    }
+
+    return { id: categories.id, name: categories.name };
+  }
+
+  async mapperSubcategories(categories: Category[]): Promise<CategoryDto[]> {
+    const categoriesWithSubcategories: CategoryDto[] = [];
+
+    for (const { id, name } of categories) {
+      const subcategories = await this.categoriesRepository.find({
+        where: { parentId: id },
+        order: { name: 'asc' },
+      });
+
+      const subcategoriesFormatted: SubcategoryDto[] = subcategories.map(
+        ({ id, name, parentId }) => ({ id, name, parentId }),
+      );
+
+      categoriesWithSubcategories.push({
+        id,
+        name,
+        subcategories: subcategoriesFormatted,
+      });
+    }
+
+    return categoriesWithSubcategories;
   }
 
   async deleteAllCategories() {
@@ -147,4 +200,24 @@ export class CategoriesService {
 
     return await query.delete().where({}).execute();
   }
+
+  // ??? TRANSACTION with DataSource
+  // async removeCategory(id: number): Promise<void> {
+  //   const queryRunner = this.dataSource.createQueryRunner();
+  //   await queryRunner.connect();
+  //   await queryRunner.startTransaction();
+  //   try {
+  //     await this.findOne(id);
+
+  //     await queryRunner.manager.delete(Category, { parentId: id });
+  //     await queryRunner.manager.delete(Category, id);
+
+  //     await queryRunner.commitTransaction();
+  //   } catch (error) {
+  //     await queryRunner.rollbackTransaction();
+  //     errorManager(error);
+  //   } finally {
+  //     await queryRunner.release();
+  //   }
+  // }
 }
