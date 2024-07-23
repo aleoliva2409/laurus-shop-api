@@ -11,7 +11,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { Category, Subcategory } from '../../categories/entities';
+import { Category } from '../../categories/entities';
 import { SizeType } from '../../shared/types';
 import { Variant } from './variant.entity';
 
@@ -26,7 +26,7 @@ export class Product {
   @Column('varchar', { length: 220 })
   description: string;
 
-  @Column('varchar', { length: 50 })
+  @Column('varchar', { length: 50, unique: true })
   slug: string;
 
   @Column('decimal', {
@@ -52,13 +52,11 @@ export class Product {
   @Column('enum', { enum: SizeType, name: 'size_type' })
   sizeType: SizeType;
 
+  @Column()
+  categoryId: number;
+
   @ManyToOne(() => Category, (category) => category.products, { nullable: false })
   category: Category;
-
-  @ManyToOne(() => Subcategory, (subcategory) => subcategory.products, {
-    nullable: false,
-  })
-  subcategory: Subcategory;
 
   @OneToMany(() => Variant, (variant) => variant.product)
   variants: Variant[];

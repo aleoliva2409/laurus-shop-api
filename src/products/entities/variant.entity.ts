@@ -22,22 +22,32 @@ export class Variant {
   @Column('integer')
   stock: number;
 
-  @Column('varchar', { length: 50 })
-  sku: string;
+  @Column('varchar', { length: 50, nullable: true })
+  sku?: string;
 
-  // @Column('decimal', {
-  //   nullable: false,
-  //   precision: 10,
-  //   scale: 2,
-  //   transformer: {
-  //     from: (price: number) => Number(price),
-  //     to: (price: number) => Number(price),
-  //   },
-  // })
-  // price: number;
+  @Column('decimal', {
+    nullable: true,
+    precision: 10,
+    scale: 2,
+    transformer: {
+      from: (price: number) => Number(price),
+      to: (price: number) => Number(price),
+    },
+    default: null,
+  })
+  price?: number;
 
   // @Column('text', { array: true, default: [] })
   // images?: string[] = [];
+
+  @Column()
+  sizeId: number;
+
+  @Column()
+  colorId?: number;
+
+  @Column()
+  productId: string;
 
   @OneToMany(() => VariantInOrder, (variantInOrder) => variantInOrder.variant)
   variantInOrder: VariantInOrder[];

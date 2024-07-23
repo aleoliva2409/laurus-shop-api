@@ -2,7 +2,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 
 import { IsBoolean, IsNumber, IsOptional, IsString, Length, Min } from 'class-validator';
 
-import { Category, Subcategory } from '../../categories/entities';
+import { Category } from '../../categories/entities';
 
 export class UpdateProductDto {
   @ApiPropertyOptional({ example: 'ART. 200' })
@@ -38,9 +38,4 @@ export class UpdateProductDto {
   @IsNumber()
   @IsOptional()
   category?: Category;
-
-  @ApiPropertyOptional({ example: 5 })
-  @IsNumber()
-  @IsOptional()
-  subcategory?: Subcategory;
 }

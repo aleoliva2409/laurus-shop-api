@@ -11,7 +11,7 @@ import {
   Min,
 } from 'class-validator';
 
-import { Category, Subcategory } from '../../categories/entities';
+import { Category } from '../../categories/entities';
 import { SizeType } from '../../shared/types';
 import { Color } from '../entities';
 
@@ -53,10 +53,6 @@ export class CreateProductDto {
   @ApiProperty({ example: 1 })
   @IsNumber()
   category: Category;
-
-  @ApiProperty({ example: 5 })
-  @IsNumber()
-  subcategory: Subcategory;
 
   @ApiPropertyOptional({ example: '0003299303000' })
   @IsString()
