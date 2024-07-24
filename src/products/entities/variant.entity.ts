@@ -35,7 +35,7 @@ export class Variant {
     },
     default: 0,
   })
-  price: number;
+  price: number = 0;
 
   @Column('boolean', { default: false, name: 'main_variant' })
   mainVariant: boolean;

@@ -7,8 +7,14 @@ export class Image {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column('varchar', { length: 255 })
+  @Column('text')
   url: string;
+
+  @Column('varchar', { name: 'cloudinary_id', length: 30 })
+  cloudinaryId: string;
+
+  @Column('boolean', { name: 'is_cover', default: false })
+  isCover: boolean;
 
   @Column()
   variantId: string;
