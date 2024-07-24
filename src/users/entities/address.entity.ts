@@ -51,6 +51,12 @@ export class Address {
   @Column('varchar', { length: 128, nullable: true })
   observations?: string;
 
+  @Column()
+  provinceId: number;
+
+  @Column()
+  userId: string;
+
   @OneToMany(() => Order, (order) => order.address)
   orders: Order[];
 

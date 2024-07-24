@@ -20,13 +20,13 @@ export class Product {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('varchar', { length: 100, unique: true })
+  @Column('varchar', { length: 60, unique: true })
   title: string;
 
   @Column('varchar', { length: 220 })
   description: string;
 
-  @Column('varchar', { length: 50, unique: true })
+  @Column('varchar', { length: 60, unique: true })
   slug: string;
 
   @Column('decimal', {
@@ -39,9 +39,6 @@ export class Product {
     },
   })
   price: number;
-
-  @Column('varchar', { length: 150, nullable: true })
-  imageUrl?: string;
 
   @Column('boolean', { name: 'is_visible', default: true })
   isVisible: boolean;

@@ -13,6 +13,7 @@ import { Color } from './color.entity';
 import { Product } from './product.entity';
 import { Size } from './size.entity';
 import { VariantInOrder } from '../../orders/entities';
+import { Image } from './image.entity';
 
 @Entity('variants')
 export class Variant {
@@ -26,19 +27,18 @@ export class Variant {
   sku?: string;
 
   @Column('decimal', {
-    nullable: true,
     precision: 10,
     scale: 2,
     transformer: {
       from: (price: number) => Number(price),
       to: (price: number) => Number(price),
     },
-    default: null,
+    default: 0,
   })
-  price?: number;
+  price: number;
 
-  // @Column('text', { array: true, default: [] })
-  // images?: string[] = [];
+  @Column('boolean', { default: false, name: 'main_variant' })
+  mainVariant: boolean;
 
   @Column()
   sizeId: number;
@@ -51,6 +51,9 @@ export class Variant {
 
   @OneToMany(() => VariantInOrder, (variantInOrder) => variantInOrder.variant)
   variantInOrder: VariantInOrder[];
+
+  @OneToMany(() => Image, (image) => image.variant)
+  images: Image[];
 
   @ManyToOne(() => Size, (size) => size.variants, { nullable: false })
   size: Size;
