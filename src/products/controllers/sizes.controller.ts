@@ -13,6 +13,6 @@ export class SizesController {
   @ApiQuery({ enum: SizeType, name: 'type', required: true })
   @Get()
   findAll(@Query('type', new ParseEnumPipe(SizeType)) type: SizeType) {
-    return this.sizesService.findAll(type);
+    return this.sizesService.findByType(type);
   }
 }

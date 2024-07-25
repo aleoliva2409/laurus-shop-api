@@ -1,9 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
-
-import { Color } from '../entities';
-import { SizeType } from '../../shared/types';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateVariantDto {
   @ApiPropertyOptional({ example: '0003299303000' })
@@ -11,14 +8,23 @@ export class CreateVariantDto {
   @IsOptional()
   sku?: string;
 
-  @ApiProperty({ example: SizeType.alpha })
-  @IsEnum(SizeType)
-  size: SizeType;
+  @ApiProperty({ example: 1 })
+  @IsNumber()
+  sizeId: number;
+
+  @ApiProperty({ example: true })
+  @IsBoolean()
+  mainVariant: boolean;
 
   @ApiPropertyOptional({ example: 1 })
   @IsNumber()
   @IsOptional()
-  color?: Color;
+  colorId?: number;
+
+  @ApiPropertyOptional({ example: true })
+  @IsBoolean()
+  @IsOptional()
+  disabled?: boolean;
 
   @ApiProperty({ example: 5 })
   @IsNumber()

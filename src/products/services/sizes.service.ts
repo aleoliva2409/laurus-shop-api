@@ -11,7 +11,7 @@ import { errorManager } from 'src/shared/utils';
 export class SizesService {
   constructor(@InjectRepository(Size) private readonly sizesRepository: Repository<Size>) {}
 
-  async findAll(type: SizeType): Promise<Size[]> {
+  async findByType(type: SizeType): Promise<Size[]> {
     try {
       const sizes = await this.sizesRepository.find({
         order: { order: 'asc' },

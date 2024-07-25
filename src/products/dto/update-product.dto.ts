@@ -2,8 +2,6 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 
 import { IsBoolean, IsNumber, IsOptional, IsString, Length, Min } from 'class-validator';
 
-import { Category } from '../../categories/entities';
-
 export class UpdateProductDto {
   @ApiPropertyOptional({ example: 'ART. 200' })
   @IsString()
@@ -23,19 +21,13 @@ export class UpdateProductDto {
   @IsOptional()
   price?: number;
 
-  @ApiPropertyOptional({ example: 'http://localhost:3001/api/image' })
-  @IsString()
-  @IsOptional()
-  @IsOptional()
-  imageUrl?: string;
-
   @ApiPropertyOptional({ example: true })
   @IsBoolean()
   @IsOptional()
-  isVisible?: boolean;
+  disabled?: boolean;
 
   @ApiPropertyOptional({ example: 1 })
   @IsNumber()
   @IsOptional()
-  category?: Category;
+  categoryId?: number;
 }

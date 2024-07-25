@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from
 import { ApiTags } from '@nestjs/swagger';
 
 import { ProductsService } from '../services';
-import { CreateProductDto, UpdateProductDto } from '../dto';
+import { CreateProductDto, CreateVariantDto, UpdateProductDto, UpdateVariantDto } from '../dto';
 
 @ApiTags('Products')
 @Controller('products')
@@ -11,7 +11,7 @@ export class ProductsController {
 
   @Post()
   create(@Body() createProductDto: CreateProductDto) {
-    return this.productsService.create(createProductDto);
+    return this.productsService.createProduct(createProductDto);
   }
 
   @Get()
@@ -19,36 +19,46 @@ export class ProductsController {
     return this.productsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.productsService.findOne(+id);
+  @Get(':productId')
+  findOne(@Param('productId', ParseUUIDPipe) productId: string) {
+    return this.productsService.findOne(productId);
   }
 
-  @Patch(':id')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productsService.update(+id, updateProductDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.productsService.remove(+id);
-  }
-
-  @Post(':id/variants')
-  createVariant(@Body() createProductDto: CreateProductDto) {
-    return this.productsService.create(createProductDto);
-  }
-
-  @Patch(':id/variants/:variantId')
-  updateVariant(
-    @Param('id', ParseUUIDPipe) id: string,
+  @Patch(':productId')
+  update(
+    @Param('productId', ParseUUIDPipe) productId: string,
     @Body() updateProductDto: UpdateProductDto,
   ) {
-    return this.productsService.update(+id, updateProductDto);
+    return this.productsService.updateProduct(productId, updateProductDto);
   }
 
-  @Delete(':id/variants/:variantId')
-  removeVariant(@Param('id', ParseUUIDPipe) id: string) {
-    return this.productsService.remove(+id);
+  @Delete(':productId')
+  remove(@Param('productId', ParseUUIDPipe) productId: string) {
+    return this.productsService.removeProduct(productId);
+  }
+
+  @Post(':productId/variants')
+  createVariant(
+    @Param('productId', ParseUUIDPipe) productId: string,
+    @Body() createVariantDto: CreateVariantDto,
+  ) {
+    return this.productsService.createVariant(productId, createVariantDto);
+  }
+
+  @Patch(':productId/variants/:variantId')
+  updateVariant(
+    @Param('productId', ParseUUIDPipe) productId: string,
+    @Param('variantId', ParseUUIDPipe) variantId: string,
+    @Body() updateVariantDto: UpdateVariantDto,
+  ) {
+    return this.productsService.updateVariant(productId, variantId, updateVariantDto);
+  }
+
+  @Delete(':productId/variants/:variantId')
+  removeVariant(
+    @Param('productId', ParseUUIDPipe) productId: string,
+    @Param('variantId', ParseUUIDPipe) variantId: string,
+  ) {
+    return this.productsService.removeVariant(productId, variantId);
   }
 }
