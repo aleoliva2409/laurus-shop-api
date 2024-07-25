@@ -10,10 +10,10 @@ import {
 } from 'typeorm';
 
 import { Color } from './color.entity';
+import { Image } from './image.entity';
 import { Product } from './product.entity';
 import { Size } from './size.entity';
 import { VariantInOrder } from '../../orders/entities';
-import { Image } from './image.entity';
 
 @Entity('variants')
 export class Variant {
@@ -26,16 +26,8 @@ export class Variant {
   @Column('varchar', { length: 50, nullable: true })
   sku?: string;
 
-  @Column('decimal', {
-    precision: 10,
-    scale: 2,
-    transformer: {
-      from: (price: number) => Number(price),
-      to: (price: number) => Number(price),
-    },
-    default: 0,
-  })
-  price: number = 0;
+  @Column('boolean', { default: false })
+  disabled: boolean;
 
   @Column('boolean', { default: false, name: 'main_variant' })
   mainVariant: boolean;

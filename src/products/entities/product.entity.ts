@@ -40,8 +40,8 @@ export class Product {
   })
   price: number;
 
-  @Column('boolean', { name: 'is_visible', default: true })
-  isVisible: boolean;
+  @Column('boolean', { default: false })
+  disabled: boolean;
 
   // @Column('varchar', { length: 15, array: true, default: [] })
   // tags?: string[];
