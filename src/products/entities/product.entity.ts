@@ -80,10 +80,11 @@ export class Product {
 
   @BeforeUpdate()
   checkSlug() {
-    this.slug = this.slug
-      .toLowerCase()
-      .replaceAll(' ', '_')
-      .replaceAll("'", '')
-      .replaceAll('.', '');
+    if (this.slug)
+      this.slug = this.slug
+        .toLowerCase()
+        .replaceAll(' ', '_')
+        .replaceAll("'", '')
+        .replaceAll('.', '');
   }
 }

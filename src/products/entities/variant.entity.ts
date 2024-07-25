@@ -35,7 +35,7 @@ export class Variant {
   @Column()
   sizeId: number;
 
-  @Column()
+  @Column('integer', { nullable: true, default: null })
   colorId?: number;
 
   @Column()
