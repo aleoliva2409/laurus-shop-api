@@ -82,13 +82,27 @@ export class ProductsService {
     }
   }
 
-  async removeProduct(productId: string) {
+  async removeProduct(productId: string): Promise<void> {
+    const queryRunner = this.productsRepository.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
     try {
-      await this.findProduct(productId);
+      const products = await this.findProduct(productId, { relations: { variants: true } });
 
-      return await this.productsRepository.softDelete(productId);
+      for (const variant of products.variants) {
+        await queryRunner.query('UPDATE variants SET deleted_at = now() WHERE id = $1', [
+          variant.id,
+        ]);
+      }
+
+      await queryRunner.query('UPDATE products SET deleted_at = now() WHERE id = $1', [productId]);
+
+      await queryRunner.commitTransaction();
     } catch (error) {
+      queryRunner.rollbackTransaction();
       errorManager(error);
+    } finally {
+      queryRunner.release();
     }
   }
 
