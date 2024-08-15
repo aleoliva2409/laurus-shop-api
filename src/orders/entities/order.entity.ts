@@ -61,7 +61,7 @@ export class Order {
   @Column('integer')
   userId: number;
 
-  @Column('integer', { nullable: true })
+  @Column('integer', { nullable: true, default: null })
   addressId: number;
 
   @OneToMany(() => VariantInOrder, (variantInOrder) => variantInOrder.order)
