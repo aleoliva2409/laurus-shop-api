@@ -19,6 +19,12 @@ export class VariantInOrder {
   @Column('integer')
   quantity: number;
 
+  @Column('varchar', { length: 36 })
+  variantId: string;
+
+  @Column('varchar', { length: 36 })
+  orderId: string;
+
   @ManyToOne(() => Variant, (variant) => variant.variantInOrder)
   variant: Variant;
 

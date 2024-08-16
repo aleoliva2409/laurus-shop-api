@@ -1,13 +1,18 @@
+export enum PaymentType {
+  cash = 'cash',
+  bankTransfer = 'bankTransfer',
+  mercadopago = 'mercadopago',
+}
+
+export enum DeliveryType {
+  pickUpInStore = 'pickUpInStore',
+  shipping = 'shipping',
+}
+
 export enum PaymentStatus {
   noPay = 'noPay',
   pendingToPay = 'pendingToPay',
   paid = 'paid',
-}
-
-export enum PaymentType {
-  cash = 'cash',
-  trasfer = 'trasfer',
-  mercadopago = 'mercadopago',
 }
 
 export enum ShippingStatus {

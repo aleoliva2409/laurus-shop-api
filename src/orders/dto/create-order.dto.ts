@@ -1,6 +1,25 @@
-import { IsArray, IsNumber, IsObject, IsOptional, IsString, IsUUID, Min } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Min,
+} from 'class-validator';
+
+import { DeliveryType, PaymentType } from 'src/shared/types';
 
 export class CreateOrderDto {
+  @IsEnum(PaymentType)
+  @IsString()
+  paymentType: PaymentType;
+
+  @IsEnum(DeliveryType)
+  @IsString()
+  deliveryType: DeliveryType;
+
   @IsNumber()
   @Min(1)
   total: number;
@@ -9,12 +28,10 @@ export class CreateOrderDto {
   @Min(1)
   totalItems: number;
 
-  @IsNumber()
-  userId: number;
-
-  @IsNumber()
+  @IsString()
+  @IsUUID()
   @IsOptional()
-  addressId?: number;
+  addressId?: string;
 
   @IsArray({ each: true })
   @IsObject()

@@ -51,10 +51,10 @@ export class Address {
   @Column('varchar', { length: 128, nullable: true })
   observations?: string;
 
-  @Column()
+  @Column('integer')
   provinceId: number;
 
-  @Column()
+  @Column('varchar', { length: 36 })
   userId: string;
 
   @OneToMany(() => Order, (order) => order.address)

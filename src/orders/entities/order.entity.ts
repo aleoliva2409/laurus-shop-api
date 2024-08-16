@@ -9,7 +9,13 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { DeliveryStatus, PaymentStatus, PaymentType, ShippingStatus } from '../../shared/types';
+import {
+  DeliveryStatus,
+  DeliveryType,
+  PaymentStatus,
+  PaymentType,
+  ShippingStatus,
+} from '../../shared/types';
 import { Address, User } from '../../users/entities';
 import { VariantInOrder } from './variant-in-order.entity';
 
@@ -32,6 +38,9 @@ export class Order {
 
   @Column('enum', { enum: PaymentType, name: 'payment_type', nullable: false })
   paymentType: PaymentType;
+
+  @Column('enum', { enum: DeliveryType, name: 'delivery_type', nullable: false })
+  deliveryType: DeliveryType;
 
   @Column('enum', { enum: PaymentStatus, name: 'payment_status', default: PaymentStatus.noPay })
   paymentStatus: PaymentStatus;
@@ -58,11 +67,11 @@ export class Order {
   @Column('integer', { name: 'total_items' })
   totalItems: number;
 
-  @Column('integer')
-  userId: number;
+  @Column('varchar', { length: 36 })
+  userId: string;
 
-  @Column('integer', { nullable: true, default: null })
-  addressId: number;
+  @Column('varchar', { length: 36, nullable: true, default: null })
+  addressId?: string;
 
   @OneToMany(() => VariantInOrder, (variantInOrder) => variantInOrder.order)
   variantInOrder: VariantInOrder[];

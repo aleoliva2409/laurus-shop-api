@@ -49,7 +49,7 @@ export class Product {
   @Column('enum', { enum: SizeType, name: 'size_type' })
   sizeType: SizeType;
 
-  @Column()
+  @Column('integer', { nullable: false })
   categoryId: number;
 
   @ManyToOne(() => Category, (category) => category.products, { nullable: false })

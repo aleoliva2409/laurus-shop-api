@@ -32,13 +32,13 @@ export class Variant {
   @Column('boolean', { default: false, name: 'main_variant' })
   mainVariant: boolean;
 
-  @Column()
+  @Column('integer', { nullable: false })
   sizeId: number;
 
   @Column('integer', { nullable: true, default: null })
   colorId?: number;
 
-  @Column()
+  @Column('varchar', { length: 36, nullable: false })
   productId: string;
 
   @OneToMany(() => VariantInOrder, (variantInOrder) => variantInOrder.variant)
