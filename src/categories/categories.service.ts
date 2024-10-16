@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { DataSource, DeleteResult, IsNull, Repository, UpdateResult } from 'typeorm';
+import { DeleteResult, IsNull, Repository, UpdateResult } from 'typeorm';
 
 import { CategoryDto, CreateCategoryDto, SubcategoryDto, UpdateCategoryDto } from './dto';
 import { Category } from './entities';
@@ -12,7 +12,7 @@ export class CategoriesService {
   constructor(
     @InjectRepository(Category)
     private readonly categoriesRepository: Repository<Category>,
-    private readonly dataSource: DataSource,
+    // private readonly dataSource: DataSource,
   ) {}
 
   async createCategory(createCategoryDto: CreateCategoryDto, parentId?: number): Promise<void> {
