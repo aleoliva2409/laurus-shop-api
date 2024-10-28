@@ -54,7 +54,7 @@ export class Address {
   @Column('integer')
   provinceId: number;
 
-  @Column('varchar', { length: 36 })
+  @Column('varchar')
   userId: string;
 
   @OneToMany(() => Order, (order) => order.address)

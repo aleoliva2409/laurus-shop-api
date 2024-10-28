@@ -38,7 +38,7 @@ export class Variant {
   @Column('integer', { nullable: true, default: null })
   colorId?: number;
 
-  @Column('varchar', { length: 36, nullable: false })
+  @Column('varchar', { nullable: false })
   productId: string;
 
   @OneToMany(() => VariantInOrder, (variantInOrder) => variantInOrder.variant)

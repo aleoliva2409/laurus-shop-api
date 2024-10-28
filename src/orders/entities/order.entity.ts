@@ -67,10 +67,10 @@ export class Order {
   @Column('integer', { name: 'total_items' })
   totalItems: number;
 
-  @Column('varchar', { length: 36 })
+  @Column('varchar')
   userId: string;
 
-  @Column('varchar', { length: 36, nullable: true, default: null })
+  @Column('varchar', { nullable: true, default: null })
   addressId?: string;
 
   @OneToMany(() => VariantInOrder, (variantInOrder) => variantInOrder.order)

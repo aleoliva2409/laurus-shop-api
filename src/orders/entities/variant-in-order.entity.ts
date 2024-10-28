@@ -19,10 +19,10 @@ export class VariantInOrder {
   @Column('integer')
   quantity: number;
 
-  @Column('varchar', { length: 36 })
+  @Column('varchar')
   variantId: string;
 
-  @Column('varchar', { length: 36 })
+  @Column('varchar')
   orderId: string;
 
   @ManyToOne(() => Variant, (variant) => variant.variantInOrder)
