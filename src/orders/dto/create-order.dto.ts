@@ -10,6 +10,7 @@ import {
 } from 'class-validator';
 
 import { DeliveryType, PaymentType } from 'src/shared/types';
+import { AddVariantInOrderDto } from './add-variant-in-order.dto';
 
 export class CreateOrderDto {
   @IsEnum(PaymentType)
@@ -33,17 +34,7 @@ export class CreateOrderDto {
   @IsOptional()
   addressId?: string;
 
-  @IsArray({ each: true })
-  @IsObject()
-  variants: VariantDto[];
-}
-
-class VariantDto {
-  @IsString()
-  @IsUUID()
-  id: string;
-
-  @IsNumber()
-  @Min(1)
-  quantity: number;
+  @IsArray()
+  @IsObject({ each: true })
+  variants: AddVariantInOrderDto[];
 }
