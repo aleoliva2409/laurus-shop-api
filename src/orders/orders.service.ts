@@ -1,33 +1,47 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { DataSource, DeleteResult, Repository, UpdateResult } from 'typeorm';
 
-import { AddVariantInOrderDto, CreateOrderDto, UpdateOrderDto } from './dto';
+import { CreateOrderDto, UpdateOrderDto } from './dto';
 import { Order, VariantInOrder } from './entities';
 import { errorManager } from 'src/shared/utils';
 
 @Injectable()
 export class OrdersService {
   constructor(
-    @InjectRepository(Order)
-    private readonly ordersRepository: Repository<Order>,
-    @InjectRepository(VariantInOrder)
-    private readonly variantInOrderRepository: Repository<VariantInOrder>,
+    @InjectRepository(Order) private readonly ordersRepository: Repository<Order>,
+    private readonly dataSource: DataSource,
   ) {}
 
+  //TODO: stop serve when transaction is failed, check error
   async create(createOrderDto: CreateOrderDto, userId: string): Promise<void> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
     try {
       const { variants, ...rest } = createOrderDto;
-      const order = this.ordersRepository.create({ ...rest, userId });
 
-      await this.ordersRepository.save(order);
+      const order = queryRunner.manager.create(Order, { ...rest, userId });
 
-      variants.forEach(async (variant: AddVariantInOrderDto) => {
-        await this.addVariantInOrder(variant);
-      });
+      await queryRunner.manager.save(order);
+
+      //?? don't use forEach!! because queryRunner doesn't works with it
+      for (const variant of variants) {
+        const variantInOrder = queryRunner.manager.create(VariantInOrder, {
+          ...variant,
+          orderId: order.id,
+        });
+
+        await queryRunner.manager.save(variantInOrder);
+      }
+
+      await queryRunner.commitTransaction();
     } catch (error) {
+      queryRunner.rollbackTransaction();
       errorManager(error);
+    } finally {
+      queryRunner.release();
     }
   }
 
@@ -78,14 +92,6 @@ export class OrdersService {
       await this.findOne(id);
 
       return await this.ordersRepository.softDelete(id);
-    } catch (error) {
-      errorManager(error);
-    }
-  }
-
-  async addVariantInOrder(addVariantInOrderDto: AddVariantInOrderDto): Promise<void> {
-    try {
-      await this.variantInOrderRepository.save(addVariantInOrderDto);
     } catch (error) {
       errorManager(error);
     }

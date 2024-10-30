@@ -1,11 +1,8 @@
-import { PartialType } from '@nestjs/mapped-types';
-
 import { IsBoolean, IsDate, IsEnum, IsOptional, IsString } from 'class-validator';
 
-import { CreateOrderDto } from './create-order.dto';
 import { DeliveryStatus, PaymentStatus, ShippingStatus } from 'src/shared/types';
 
-export class UpdateOrderDto extends PartialType(CreateOrderDto) {
+export class UpdateOrderDto {
   @IsBoolean()
   @IsOptional()
   isPaid?: boolean;

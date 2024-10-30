@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, IsString, IsUUID, Min } from 'class-validator';
 
-export class AddVariantInOrderDto {
+export class VariantInOrderDto {
   @IsNumber()
   @Min(1)
   @IsNotEmpty()
@@ -10,9 +10,8 @@ export class AddVariantInOrderDto {
   @IsUUID()
   @IsNotEmpty()
   variantId: string;
+}
 
-  @IsString()
-  @IsUUID()
-  @IsNotEmpty()
+export interface IVariantInOrder extends VariantInOrderDto {
   orderId: string;
 }

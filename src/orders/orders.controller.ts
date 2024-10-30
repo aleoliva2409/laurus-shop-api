@@ -11,7 +11,7 @@ export class OrdersController {
 
   @Post()
   create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto, '');
+    return this.ordersService.create(createOrderDto, '8fd244eb-7dd7-4eb2-8ac2-366fb369a309');
   }
 
   @Get()
