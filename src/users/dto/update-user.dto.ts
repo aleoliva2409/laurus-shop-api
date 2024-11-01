@@ -1,4 +1,5 @@
 import { IsBoolean, IsEnum, IsOptional } from 'class-validator';
+
 import { Role } from 'src/shared/types';
 
 export class UpdateUserDto {
