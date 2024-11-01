@@ -24,7 +24,7 @@ export class User {
   @Column('varchar', { length: 40, unique: true })
   email: string;
 
-  @Column('varchar', { length: 20 })
+  @Column('varchar', { length: 150, select: false })
   password: string;
 
   @Column('boolean', { default: true, name: 'is_active' })
