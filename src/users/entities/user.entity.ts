@@ -30,6 +30,9 @@ export class User {
   @Column('boolean', { default: true, name: 'is_active' })
   isActive: boolean;
 
+  @Column('boolean', { default: false, name: 'is_google_account' })
+  isGoogleAccount: boolean;
+
   @Column('enum', { enum: Role, default: Role.client })
   role: Role;
 
