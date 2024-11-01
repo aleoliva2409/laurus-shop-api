@@ -45,15 +45,35 @@ export class UsersService {
     }
   }
 
-  findOne(id: string): Promise<User> {
-    return this.findOneWithFilters({ where: { id } });
+  async findOne(id: string): Promise<User> {
+    try {
+      const user = await this.findOneWithFilters({ where: { id } });
+
+      if (!user) {
+        throw new NotFoundException(`Cannot find user with id ${id}`);
+      }
+
+      return user;
+    } catch (error) {
+      errorManager(error);
+    }
   }
 
-  findMe(id: string): Promise<User> {
-    return this.findOneWithFilters({
-      where: { id },
-      relations: { orders: true },
-    });
+  async findMe(id: string): Promise<User> {
+    try {
+      const user = await this.findOneWithFilters({
+        where: { id },
+        relations: { orders: true },
+      });
+
+      if (!user) {
+        throw new NotFoundException(`User does not exist`);
+      }
+
+      return user;
+    } catch (error) {
+      errorManager(error);
+    }
   }
 
   async update(id: string, updateUserDto: UpdateUserDto | UpdateProfileDto) {
@@ -76,18 +96,8 @@ export class UsersService {
     }
   }
 
-  async findOneWithFilters(filters: FindOneOptions<User>): Promise<User> {
-    try {
-      const user = await this.usersRepository.findOne(filters);
-
-      if (!user) {
-        throw new NotFoundException(`User does not exist`);
-      }
-
-      return user;
-    } catch (error) {
-      errorManager(error);
-    }
+  findOneWithFilters(filters: FindOneOptions<User>): Promise<User> {
+    return this.usersRepository.findOne(filters);
   }
 
   //** ADDRESSES **//

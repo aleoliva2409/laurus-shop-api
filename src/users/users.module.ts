@@ -9,5 +9,6 @@ import { Address, Province, User } from './entities';
   imports: [TypeOrmModule.forFeature([Address, Province, User])],
   controllers: [UsersController],
   providers: [UsersService],
+  exports: [TypeOrmModule, UsersService],
 })
 export class UsersModule {}
