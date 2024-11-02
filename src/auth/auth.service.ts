@@ -1,33 +1,32 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { compareSync } from 'bcrypt';
 
-import { CreateUserDto } from 'src/users/dto';
+import { compareSync } from 'bcrypt';
+import { Response } from 'express';
+
 import { UsersService } from 'src/users/users.service';
 import { IAuthResponse } from './types/auth.interface';
-import { LoginDto } from './dto/login.dto';
 import { errorManager } from 'src/shared/utils';
+import { User } from 'src/users/entities';
+import { LoginDto, RegisterDto } from './dto';
+import { CreateUserDto } from 'src/users/dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService,
+    private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
+    private readonly usersService: UsersService,
   ) {}
 
-  // async register(createUserDto: CreateUserDto): Promise<IAuthResponse> {
-  async register(createUserDto: CreateUserDto): Promise<any> {
+  async register(registerDto: RegisterDto): Promise<IAuthResponse> {
     try {
-      // const user = await this.usersService.create(createUserDto);
-      console.log(createUserDto);
-
-      // const userCreated = { ...user };
-      // delete userCreated.password;
+      const user = await this.usersService.create(registerDto);
 
       return {
-        token: this.generateJwt(1),
-        // user: userCreated,
-        user: {},
+        ...this.generateJwt(user.id),
+        user,
       };
     } catch (error) {
       errorManager(error);
@@ -36,35 +35,85 @@ export class AuthService {
 
   async login(loginDto: LoginDto): Promise<IAuthResponse> {
     try {
-      // const { email, password } = loginDto;
-      const { password } = loginDto;
-      // const user = await this.usersService.findOneWithFilters({
-      //   where: { email },
-      //   select: { password: true, id: true },
-      // });
-
-      const user = { id: 1, password: '' };
+      const { email, password } = loginDto;
+      const user = await this.usersService.findOneWithFilters({
+        where: { email },
+      });
 
       if (!user) {
         throw new UnauthorizedException('Credentials are not authorized');
       }
 
-      if (!compareSync(password, user.password)) {
+      const { password: userPass, ...restUser } = user;
+
+      if (!compareSync(password, userPass)) {
         throw new UnauthorizedException('Credentials are not authorized');
       }
 
-      const userCreated = await this.usersService.findOne(user.id);
-
       return {
-        token: this.generateJwt(user.id),
-        user: userCreated,
+        ...this.generateJwt(restUser.id),
+        user: restUser as User,
       };
     } catch (error) {
       errorManager(error);
     }
   }
 
-  private generateJwt(userId: number) {
-    return this.jwtService.sign({ id: userId });
+  async googleLogin(createUserDto: CreateUserDto, res: Response) {
+    const { email } = createUserDto;
+
+    const user = await this.usersService.findOneWithFilters({
+      where: { email },
+    });
+
+    if (user) {
+      res.redirect(
+        this.configService.getOrThrow<string>('REDIRECT_AUTH_TOKEN') + '?' + createUserDto.fullName,
+      );
+      return {
+        ...this.generateJwt(user.id),
+        user,
+      };
+
+      // TODO: ver lo del redirect
+    }
+
+    const newUser = await this.usersService.create(createUserDto);
+
+    // TODO: ver lo del redirect
+    // res.redirect(
+    //   this.configService.getOrThrow<string>('REDIRECT_AUTH_TOKEN') + createUserDto.fullName,
+    // );
+
+    return {
+      ...this.generateJwt(newUser.id),
+      user: newUser,
+    };
+  }
+
+  async refreshToken(userId: string) {
+    try {
+      const user = await this.usersService.findOne(userId);
+
+      return {
+        ...this.generateJwt(user.id),
+        user,
+      };
+    } catch (error) {
+      errorManager(error);
+    }
+  }
+
+  private generateJwt(userId: string) {
+    return {
+      token: this.jwtService.sign({ id: userId }),
+      refreshToken: this.jwtService.sign(
+        { id: userId },
+        {
+          secret: this.configService.getOrThrow<string>('REFRESH_JWT_SECRET'),
+          expiresIn: this.configService.getOrThrow<string>('REFRESH_JWT_EXPIRE_IN'),
+        },
+      ),
+    };
   }
 }

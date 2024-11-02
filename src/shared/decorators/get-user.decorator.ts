@@ -4,11 +4,12 @@ import {
   createParamDecorator,
 } from '@nestjs/common';
 
+import { CreateUserDto } from 'src/users/dto';
 import { User } from 'src/users/entities';
 
 export const GetUser = createParamDecorator((data: string, context: ExecutionContext) => {
   const req = context.switchToHttp().getRequest();
-  const user: User = req.user;
+  const user: User | CreateUserDto = req.user;
 
   if (!user) throw new InternalServerErrorException('User not found(request)');
 

@@ -1,4 +1,5 @@
 import {
+  BeforeInsert,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
@@ -7,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { hashSync } from 'bcrypt';
 
 import { Role } from '../../shared/types';
 
@@ -50,4 +52,11 @@ export class User {
 
   @DeleteDateColumn({ type: 'timestamp', name: 'deleted_at' })
   deletedAt: Date;
+
+  @BeforeInsert()
+  hashPassword() {
+    if (this.password) {
+      this.password = hashSync(this.password, 10);
+    }
+  }
 }

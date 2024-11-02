@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { hashSync } from 'bcrypt';
 import { FindOneOptions, Repository } from 'typeorm';
 
 import { CreateUserDto, UpdateProfileDto, UpdateUserDto } from './dto';
@@ -14,20 +13,15 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
-      const { password, ...userData } = createUserDto;
-
       const userInDb = await this.findOneWithFilters({
-        where: { email: userData.email },
+        where: { email: createUserDto.email },
       });
 
       if (userInDb?.email) {
-        throw new BadRequestException(`User ${userData.email} already exists`);
+        throw new BadRequestException(`User ${createUserDto.email} already exists`);
       }
 
-      const user = this.usersRepository.create({
-        ...userData,
-        password: hashSync(password, 10),
-      });
+      const user = this.usersRepository.create(createUserDto);
 
       await this.usersRepository.save(user);
 

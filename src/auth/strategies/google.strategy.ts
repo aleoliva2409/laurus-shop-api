@@ -1,15 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy, VerifyCallback } from 'passport-google-oauth20';
-import { UsersService } from 'src/users/users.service';
+
+import { Strategy } from 'passport-google-oauth20';
+
+import { CreateUserDto } from 'src/users/dto';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
-  constructor(
-    private readonly configService: ConfigService,
-    private readonly usersService: UsersService,
-  ) {
+  constructor(private readonly configService: ConfigService) {
     super({
       clientID: configService.get<string>('CLIENT_ID'),
       clientSecret: configService.get<string>('CLIENT_SECRET'),
@@ -22,18 +21,16 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     _accessToken: string,
     _refreshToken: string,
     profile: any,
-    done: VerifyCallback,
-  ): Promise<any> {
-    const { id, name, emails, photos } = profile;
+    // done: VerifyCallback,
+  ): Promise<CreateUserDto> {
+    const { name, emails } = profile;
 
-    const user = {
-      provider: 'google',
-      providerId: id,
+    const user: CreateUserDto = {
       email: emails[0].value,
-      name: `${name.givenName} ${name.familyName}`,
-      picture: photos[0].value,
+      fullName: `${name.givenName} ${name.familyName}`,
+      isGoogleAccount: true,
     };
 
-    done(null, user);
+    return user;
   }
 }

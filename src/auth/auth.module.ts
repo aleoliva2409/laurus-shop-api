@@ -5,7 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UsersModule } from 'src/users/users.module';
-import { GoogleStrategy, JwtStrategy } from './strategies';
+import { GoogleStrategy, JwtStrategy, RefreshJwtStrategy } from './strategies';
 
 @Module({
   imports: [
@@ -15,13 +15,13 @@ import { GoogleStrategy, JwtStrategy } from './strategies';
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
         signOptions: {
-          expiresIn: '10h',
+          expiresIn: configService.get<string>('JWT_EXPIRE_IN'),
         },
       }),
     }),
     UsersModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, GoogleStrategy],
+  providers: [AuthService, GoogleStrategy, JwtStrategy, RefreshJwtStrategy],
 })
 export class AuthModule {}
