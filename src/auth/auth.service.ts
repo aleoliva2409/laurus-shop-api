@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
@@ -6,11 +6,11 @@ import { compareSync } from 'bcrypt';
 import { Response } from 'express';
 
 import { UsersService } from 'src/users/users.service';
-import { IAuthResponse } from './types/auth.interface';
 import { errorManager } from 'src/shared/utils';
 import { User } from 'src/users/entities';
 import { LoginDto, RegisterDto } from './dto';
 import { CreateUserDto } from 'src/users/dto';
+import { IAuthResponse, ITokensGenerated } from './types';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +22,14 @@ export class AuthService {
 
   async register(registerDto: RegisterDto): Promise<IAuthResponse> {
     try {
+      const userInDb = await this.usersService.findOneWithFilters({
+        where: { email: registerDto.email },
+      });
+
+      if (userInDb?.email) {
+        throw new BadRequestException(`User ${registerDto.email} already exists`);
+      }
+
       const user = await this.usersService.create(registerDto);
 
       return {
@@ -60,35 +68,24 @@ export class AuthService {
   }
 
   async googleLogin(createUserDto: CreateUserDto, res: Response) {
-    const { email } = createUserDto;
+    try {
+      const { email } = createUserDto;
 
-    const user = await this.usersService.findOneWithFilters({
-      where: { email },
-    });
+      let userToLoggin = await this.usersService.findOneWithFilters({
+        where: { email },
+      });
 
-    if (user) {
-      res.redirect(
-        this.configService.getOrThrow<string>('REDIRECT_AUTH_TOKEN') + '?' + createUserDto.fullName,
-      );
-      return {
-        ...this.generateJwt(user.id),
-        user,
-      };
+      if (!userToLoggin) {
+        userToLoggin = await this.usersService.create(createUserDto);
+      }
 
-      // TODO: ver lo del redirect
+      const userTokens = this.generateJwt(userToLoggin.id);
+      const urlToRedicrect = `${this.configService.getOrThrow<string>('REDIRECT_AUTH_TOKEN')}?token=${userTokens.token}&refresh=${userTokens.refreshToken}`;
+
+      res.redirect(urlToRedicrect);
+    } catch (error) {
+      errorManager(error);
     }
-
-    const newUser = await this.usersService.create(createUserDto);
-
-    // TODO: ver lo del redirect
-    // res.redirect(
-    //   this.configService.getOrThrow<string>('REDIRECT_AUTH_TOKEN') + createUserDto.fullName,
-    // );
-
-    return {
-      ...this.generateJwt(newUser.id),
-      user: newUser,
-    };
   }
 
   async refreshToken(userId: string) {
@@ -104,7 +101,7 @@ export class AuthService {
     }
   }
 
-  private generateJwt(userId: string) {
+  private generateJwt(userId: string): ITokensGenerated {
     return {
       token: this.jwtService.sign({ id: userId }),
       refreshToken: this.jwtService.sign(

@@ -55,7 +55,9 @@ export class User {
 
   @BeforeInsert()
   hashPassword() {
-    if (this.password) {
+    if (this.isGoogleAccount && !this.password) {
+      this.password = '@';
+    } else {
       this.password = hashSync(this.password, 10);
     }
   }

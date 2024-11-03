@@ -9,3 +9,8 @@ export interface IAuthResponse {
   refreshToken: string;
   user: User;
 }
+
+export interface ITokensGenerated {
+  token: string;
+  refreshToken: string;
+}
