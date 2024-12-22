@@ -1,6 +1,7 @@
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { join } from 'path';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 
 ConfigModule.forRoot();
 const configService = new ConfigService();
