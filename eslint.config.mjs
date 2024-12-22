@@ -36,7 +36,7 @@ export default [
 
       parserOptions: {
         project: 'tsconfig.json',
-        tsconfigRootDir: 'C:\\Users\\danny\\Workspace\\my-projects\\laurus-shop\\api',
+        tsconfigRootDir: 'E:\\Projects\\Ruben-mimi\\laurus-shop\\laurus-shop-api',
       },
     },
 
