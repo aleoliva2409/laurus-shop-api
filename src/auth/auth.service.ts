@@ -46,6 +46,7 @@ export class AuthService {
       const { email, password } = loginDto;
       const user = await this.usersService.findOneWithFilters({
         where: { email },
+        select: { id: true, email: true, password: true, fullName: true },
       });
 
       if (!user) {
