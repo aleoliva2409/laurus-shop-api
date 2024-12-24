@@ -10,9 +10,9 @@ import { CreateUserDto } from 'src/users/dto';
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(private readonly configService: ConfigService) {
     super({
-      clientID: configService.get<string>('CLIENT_ID'),
-      clientSecret: configService.get<string>('CLIENT_SECRET'),
-      callbackURL: configService.get<string>('CALLBACK_URL'),
+      clientID: configService.getOrThrow<string>('CLIENT_ID'),
+      clientSecret: configService.getOrThrow<string>('CLIENT_SECRET'),
+      callbackURL: configService.getOrThrow<string>('CALLBACK_URL'),
       scope: ['profile', 'email'],
     });
   }

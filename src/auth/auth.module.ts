@@ -13,9 +13,9 @@ import { GoogleStrategy, JwtStrategy, RefreshJwtStrategy } from './strategies';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
+        secret: configService.getOrThrow<string>('JWT_SECRET'),
         signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRE_IN'),
+          expiresIn: configService.getOrThrow<string>('JWT_EXPIRE_IN'),
         },
       }),
     }),
