@@ -5,18 +5,15 @@ import { DeleteResult, FindOneOptions, Repository, UpdateResult } from 'typeorm'
 
 import { CreateProductDto, CreateVariantDto, UpdateProductDto, UpdateVariantDto } from '../dto';
 import { Product, Variant } from '../entities';
-import { MulterFile } from 'src/shared/types';
 import { errorManager } from 'src/shared/utils';
-import { CloudinaryService } from './cloudinary.service';
-import { ImagesService } from './images.service';
+// import { ImagesService } from './images.service';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectRepository(Product) private readonly productsRepository: Repository<Product>,
     @InjectRepository(Variant) private readonly variantsRepository: Repository<Variant>,
-    private readonly imagesService: ImagesService,
-    private readonly cloudinaryService: CloudinaryService,
+    // private readonly imagesService: ImagesService,
   ) {}
 
   async createProduct(createProductDto: CreateProductDto): Promise<void> {
@@ -185,18 +182,18 @@ export class ProductsService {
   }
 
   // *** IMAGES ***
-  async uploadImage(productId: string, variantId: string, file: MulterFile): Promise<void> {
-    try {
-      await this.findProduct(productId);
+  // async uploadImage(productId: string, variantId: string, file: MulterFile): Promise<void> {
+  //   try {
+  //     await this.findProduct(productId);
 
-      const { secure_url, public_id } = await this.cloudinaryService.uploadImage(file);
+  //     const { secure_url, public_id } = await this.cloudinaryService.uploadImage(file);
 
-      //? obtenemos el ID de la imagen en cloudinary
-      const cloudinaryId = public_id.split('/')[1];
+  //     //? obtenemos el ID de la imagen en cloudinary
+  //     const cloudinaryId = public_id.split('/')[1];
 
-      await this.imagesService.saveImage(variantId, secure_url, cloudinaryId);
-    } catch (error) {
-      errorManager(error);
-    }
-  }
+  //     await this.imagesService.saveImage(variantId, secure_url, cloudinaryId);
+  //   } catch (error) {
+  //     errorManager(error);
+  //   }
+  // }
 }
