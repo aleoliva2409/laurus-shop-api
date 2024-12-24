@@ -1,6 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 
+import { MulterFile } from 'src/shared/types';
+import { fileFilterInterceptor } from 'src/shared/interceptors';
 import { ProductsService } from '../services';
 import { CreateProductDto, CreateVariantDto, UpdateProductDto, UpdateVariantDto } from '../dto';
 
@@ -60,5 +75,15 @@ export class ProductsController {
     @Param('variantId', ParseUUIDPipe) variantId: string,
   ) {
     return this.productsService.removeVariant(productId, variantId);
+  }
+
+  @UseInterceptors(FileInterceptor('file', { fileFilter: fileFilterInterceptor }))
+  @Post(':productId/variants/:variantId/upload-image')
+  uploadImage(
+    @Param('productId', ParseIntPipe) productId: string,
+    @Param('variantId', ParseIntPipe) variantId: string,
+    @UploadedFile() file: MulterFile,
+  ) {
+    return this.productsService.uploadImage(productId, variantId, file);
   }
 }
