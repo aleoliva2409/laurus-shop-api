@@ -6,6 +6,7 @@ import { dataSourceOptions } from './config/data-source';
 
 import { AuthModule } from './auth/auth.module';
 import { CategoriesModule } from './categories/categories.module';
+import { FilesModule } from './files/files.module';
 import { OrdersModule } from './orders/orders.module';
 import { ProductsModule } from './products/products.module';
 import { UsersModule } from './users/users.module';
@@ -16,6 +17,7 @@ import { UsersModule } from './users/users.module';
     TypeOrmModule.forRoot(dataSourceOptions),
     AuthModule,
     CategoriesModule,
+    FilesModule,
     OrdersModule,
     ProductsModule,
     UsersModule,
